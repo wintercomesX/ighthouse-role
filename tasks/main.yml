@@ -1,0 +1,25 @@
+---
+- name: Get LightHouse distrib
+  get_url:
+    url: "https://example.com/lighthouse-latest.deb"
+    dest: "./lighthouse-latest.deb"
+  retries: 3
+  delay: 10
+
+- name: Install LightHouse
+  ansible.builtin.apt:
+    deb: "./lighthouse-latest.deb"
+    state: present
+
+- name: Deploy LightHouse configuration
+  become: true
+  ansible.builtin.template:
+    src: templates/lighthouse-config.j2
+    dest: /etc/lighthouse/lighthouse.toml
+  notify: Restart lighthouse service
+
+- name: Start LightHouse service
+  become: true
+  ansible.builtin.service:
+    name: lighthouse
+    state: started
